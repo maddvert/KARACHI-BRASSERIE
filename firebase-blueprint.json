@@ -1,0 +1,190 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Customer profile and saved Karachi delivery preferences.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "photoURL": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 24
+        },
+        "defaultArea": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "defaultAddress": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "displayName", "createdAt", "updatedAt"]
+    },
+    "FavoriteItem": {
+      "title": "FavoriteItem",
+      "description": "Saved favorite menu item for a signed-in customer.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "itemName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "itemId", "itemName", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer dine-in, takeaway, or home delivery order at Karachi Brasserie.",
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "customerPhone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 24
+        },
+        "customerEmail": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "orderType": {
+          "type": "string",
+          "enum": ["delivery", "takeaway", "dine-in"]
+        },
+        "areaName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "deliveryAddress": {
+          "type": "string",
+          "maxLength": 320
+        },
+        "distanceKm": {
+          "type": "number"
+        },
+        "deliveryFee": {
+          "type": "number"
+        },
+        "subtotal": {
+          "type": "number"
+        },
+        "total": {
+          "type": "number"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["cash_on_delivery", "card_on_delivery", "pay_at_counter"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["confirmed", "preparing", "out_for_delivery", "ready", "completed"]
+        },
+        "items": {
+          "type": "array"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "orderId",
+        "userId",
+        "customerName",
+        "customerPhone",
+        "orderType",
+        "subtotal",
+        "deliveryFee",
+        "total",
+        "paymentMethod",
+        "status",
+        "items",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Authenticated customer profile document (owner-only PII protection)."
+    },
+    "/users/{userId}/favorites/{itemId}": {
+      "schema": { "$ref": "#/entities/FavoriteItem" },
+      "description": "Authenticated customer's favorite menu items."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders supporting live tracking and order history."
+    }
+  }
+}

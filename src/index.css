@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-display: 'Bebas Neue', 'Oswald', sans-serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #f4f4f5;
+    color: #111112;
+    transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-x: clip;
+  }
+
+  html.dark body {
+    background-color: #0d0d0e;
+    color: #f4f4f5;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Signature Black & White Marble Chevron / Zigzag Architectural Accent Strip */
+.kb-chevron-strip {
+  height: 10px;
+  width: 100%;
+  background:
+    linear-gradient(135deg, #18181b 25%, transparent 25%) -12px 0,
+    linear-gradient(225deg, #18181b 25%, transparent 25%) -12px 0,
+    linear-gradient(315deg, #18181b 25%, transparent 25%),
+    linear-gradient(45deg, #18181b 25%, #e4e4e7 25%);
+  background-size: 24px 10px;
+  opacity: 0.22;
+}
+
+html.dark .kb-chevron-strip {
+  background:
+    linear-gradient(135deg, #f4f4f5 25%, transparent 25%) -12px 0,
+    linear-gradient(225deg, #f4f4f5 25%, transparent 25%) -12px 0,
+    linear-gradient(315deg, #f4f4f5 25%, transparent 25%),
+    linear-gradient(45deg, #f4f4f5 25%, #27272a 25%);
+  background-size: 24px 10px;
+  opacity: 0.16;
+}
+
+/* Smooth cart icon shake & bounce when flying item lands */
+@keyframes cart-jiggle {
+  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  15% { transform: translate3d(-4px, -3px, 0) scale(1.18) rotate(-10deg); }
+  32% { transform: translate3d(4px, 1px, 0) scale(1.22) rotate(10deg); }
+  50% { transform: translate3d(-3px, -2px, 0) scale(1.14) rotate(-7deg); }
+  70% { transform: translate3d(2px, 0, 0) scale(1.06) rotate(4deg); }
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+}
+
+.animate-cart-jiggle {
+  animation: cart-jiggle 0.62s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Hide scrollbars cleanly for horizontal category strip */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-cart-jiggle {
+    animation: none;
+  }
+}

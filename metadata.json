@@ -1,0 +1,6 @@
+{
+  "name": "Karachi Brasserie",
+  "description": "Karachi Brasserie — All Day Eatery at Hotel Excelsior, Saddar, Karachi. Dine-in, takeaway, and online delivery.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

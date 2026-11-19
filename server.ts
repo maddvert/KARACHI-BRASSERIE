@@ -267,12 +267,45 @@ async function startServer() {
     })
   );
 
+function resolveRequestOrigin(req: express.Request): string {
+  const configured = process.env.APP_URL?.trim();
+  if (configured) {
+    return configured.replace(/\/+$/, '');
+  }
+  const forwardedProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+  const forwardedHost = String(req.headers['x-forwarded-host'] || '').split(',')[0].trim();
+  const proto = forwardedProto || req.protocol || 'https';
+  const host = forwardedHost || req.get('host') || `localhost:${PORT}`;
+  return `${proto}://${host}`;
+}
+
+function injectAbsoluteSocialMeta(html: string, origin: string): string {
+  return html
+    .replaceAll('content="/og-preview.jpg"', `content="${origin}/og-preview.jpg"`)
+    .replaceAll('"image": "/og-preview.jpg"', `"image": "${origin}/og-preview.jpg"`)
+    .replace('<meta property="og:url" content="/" />', `<meta property="og:url" content="${origin}/" />`)
+    .replace('<!-- CANONICAL_LINK -->', `<link rel="canonical" href="${origin}/" />`);
+}
+
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
+
+    app.get(['/', '/index.html'], async (req, res, next) => {
+      try {
+        const templatePath = path.resolve(__dirname, 'index.html');
+        const rawHtml = fs.readFileSync(templatePath, 'utf-8');
+        const transformed = await vite.transformIndexHtml(req.originalUrl, rawHtml);
+        const finalHtml = injectAbsoluteSocialMeta(transformed, resolveRequestOrigin(req));
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+      } catch (err) {
+        next(err);
+      }
+    });
+
     app.use(vite.middlewares);
   } else {
     const distDir = path.resolve(__dirname, 'dist');
@@ -283,8 +316,11 @@ async function startServer() {
           index: false,
         })
       );
-      app.get('*', (_req, res) => {
-        res.sendFile(path.join(distDir, 'index.html'));
+      app.get('*', (req, res) => {
+        const indexPath = path.join(distDir, 'index.html');
+        const rawHtml = fs.readFileSync(indexPath, 'utf-8');
+        const finalHtml = injectAbsoluteSocialMeta(rawHtml, resolveRequestOrigin(req));
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       });
     }
   }

@@ -345,11 +345,15 @@ function MainApp() {
       try {
         const snap = await getDoc(userRef);
         if (!snap.exists()) {
+          const safePhoto =
+            currentUser.photoURL && currentUser.photoURL.length <= 500
+              ? currentUser.photoURL
+              : undefined;
           const newProfile: CustomerProfile = {
             uid: currentUser.uid,
-            email: currentUser.email || 'customer@karachibrasserie.pk',
-            displayName: currentUser.displayName || 'Karachi Guest',
-            photoURL: currentUser.photoURL || undefined,
+            email: (currentUser.email || 'customer@karachibrasserie.pk').slice(0, 160),
+            displayName: (currentUser.displayName || 'Karachi Guest').slice(0, 100),
+            photoURL: safePhoto,
           };
           await setDoc(userRef, {
             uid: newProfile.uid,
